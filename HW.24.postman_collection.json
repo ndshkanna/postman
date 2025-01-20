@@ -1,0 +1,512 @@
+{
+	"info": {
+		"_postman_id": "3c65f288-3000-43a3-9666-c0fca6bdef12",
+		"name": "HW.24",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "38953385"
+	},
+	"item": [
+		{
+			"name": "Sign up",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"function getRandomString(length, charset) {\r",
+							"    let result = '';\r",
+							"    for (let i = 0; i < length; i++) {\r",
+							"        result += charset.charAt(Math.floor(Math.random() * charset.length));\r",
+							"    }\r",
+							"    return result;\r",
+							"}\r",
+							"\r",
+							"\r",
+							"function generateName(min, max) {\r",
+							"    const charset = \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\";\r",
+							"    \r",
+							"    \r",
+							"    const length = Math.floor(Math.random() * (max - min + 1)) + min;\r",
+							"    return getRandomString(length, charset);\r",
+							"}\r",
+							"\r",
+							"\r",
+							"function generateEmail() {\r",
+							"    const domains = [\"example.com\", \"test.com\", \"mail.com\"];\r",
+							"    \r",
+							"    \r",
+							"    const username = generateName(5, 10).toLowerCase();\r",
+							"    const domain = domains[Math.floor(Math.random() * domains.length)];\r",
+							"    \r",
+							"    return `${username}@${domain}`;\r",
+							"}\r",
+							"\r",
+							"\r",
+							"function generatePassword(min, max) {\r",
+							"    const lower = \"abcdefghijklmnopqrstuvwxyz\";\r",
+							"    const upper = \"ABCDEFGHIJKLMNOPQRSTUVWXYZ\";\r",
+							"    const digits = \"0123456789\";\r",
+							"    const special = \"!@#$%^&*\";\r",
+							"\r",
+							"   \r",
+							"    const length = Math.floor(Math.random() * (max - min + 1)) + min;\r",
+							"\r",
+							"    \r",
+							"    let password = [\r",
+							"        lower[Math.floor(Math.random() * lower.length)],  \r",
+							"        upper[Math.floor(Math.random() * upper.length)],  \r",
+							"        digits[Math.floor(Math.random() * digits.length)] \r",
+							"    ];\r",
+							"\r",
+							"   \r",
+							"    const allChars = lower + upper + digits + special;\r",
+							"    while (password.length < length) {\r",
+							"        password.push(allChars[Math.floor(Math.random() * allChars.length)]);\r",
+							"    }\r",
+							"\r",
+							"    \r",
+							"    return password.sort(() => Math.random() - 0.5).join('');\r",
+							"}\r",
+							"\r",
+							"\r",
+							"pm.environment.set(\"Name\", generateName(2, 20));       \r",
+							"pm.environment.set(\"LastName\", generateName(2, 20));  \r",
+							"pm.environment.set(\"Email\", generateEmail());         \r",
+							"pm.environment.set(\"Password\", generatePassword(8, 15));\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Creating user\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.data.photoFilename).to.eql(\"default-user.png\");\r",
+							"    pm.expect(jsonData.data.distanceUnits).to.eql(\"km\");\r",
+							"    pm.expect(jsonData.data.currency).to.eql(\"usd\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"{{Name}}\",\r\n  \"lastName\": \"{{LastName}}\",\r\n  \"email\": \"{{Email}}\",\r\n  \"password\": \"Qwerty12345\",\r\n  \"repeatPassword\": \"Qwerty12345\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/auth/signup",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"auth",
+						"signup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Change Name and LastName",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Fixed the ReferenceError by defining responsejson\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\t\r",
+							"pm.environment.set(\"userId\", pm.response.json().data.userId);\r",
+							"\r",
+							"pm.test(\"Id check\", function () {\r",
+							"    pm.expect(pm.response.json().data).to.have.property(\"userId\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"function getRandomString(length, charset) {\r",
+							"    let result = '';\r",
+							"    for (let i = 0; i < length; i++) {\r",
+							"        result += charset.charAt(Math.floor(Math.random() * charset.length));\r",
+							"    }\r",
+							"    return result;\r",
+							"}\r",
+							"\r",
+							"function generateName(min, max) {\r",
+							"    const charset = \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\";\r",
+							"    const length = Math.floor(Math.random() * (max - min + 1)) + min;\r",
+							"    return getRandomString(length, charset);\r",
+							"}\r",
+							"\r",
+							"pm.environment.set(\"Name\", generateName(2, 20));       \r",
+							"pm.environment.set(\"LastName\", generateName(2, 20));"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"photo\": \"user-1621352948859.jpg\",\r\n  \"name\": \"{{Name}}\",\r\n  \"lastName\": \"{{LastName}}\",\r\n  \"dateBirth\": \"2021-03-17T15:21:05.000Z\",\r\n  \"country\": \"Ukraine\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/users/profile",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"users",
+						"profile"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Change distance",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"Testing distance changing\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.data.distanceUnits).to.eql(\"ml\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"currency\": \"usd\",\r\n  \"distanceUnits\": \"ml\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/users/settings",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"users",
+						"settings"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add car",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"var responseJson = JSON.parse(responseBody);\r",
+							"console.log(\"responseJson\", responseJson);\r",
+							"pm.environment.set(\"carId\", responseJson.data.id);\r",
+							"pm.environment.set(\"carBrandId\", responseJson.data.carBrandId);\r",
+							"pm.environment.set(\"carModelId\", responseJson.data.carModelId);\r",
+							"\r",
+							"\r",
+							"pm.test(\"Car was successfully created\", function () {\r",
+							"    pm.expect(responseJson.status).to.equal(\"ok\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Id check\", function () {\r",
+							" pm.expect(responseJson.data).to.have.property(\"id\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"\r",
+							"pm.environment.set(\"carId\", responseJson.data.id);\r",
+							"pm.environment.set(\"carBrandId\", responseJson.data.carBrandId);\r",
+							"pm.environment.set(\"carModelId\", responseJson.data.carModelId);\r",
+							"pm.environment.set(\"mileage\", responseJson.data.mileage + 10);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"carBrandId\": 1,\r\n  \"carModelId\": 1,\r\n  \"mileage\": 122\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/cars",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"cars"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Change car mileage",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"var responseJson = JSON.parse(responseBody);\r",
+							"\r",
+							"pm.environment.set(\"carId\", responseJson.data.id);\r",
+							"pm.environment.set(\"carBrandId\", responseJson.data.carBrandId);\r",
+							"pm.environment.set(\"carModelId\", responseJson.data.carModelId);\r",
+							"pm.environment.set(\"mileage\", responseJson.data.mileage);\r",
+							"\r",
+							"\r",
+							"pm.test(\"Mileage was updated\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Mileage update\", function () {\r",
+							" pm.expect(responseJson.data).to.have.property(\"mileage\");\r",
+							" pm.expect(responseJson.data).to.have.property(\"carBrandId\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"carBrandId\": {{carBrandId}},\r\n  \"carModelId\": {{carModelId}},\r\n  \"mileage\": {{mileage}}\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/cars/{{carId}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"cars",
+						"{{carId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add an expence",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"var responseJson = JSON.parse(responseBody);\r",
+							"\r",
+							"pm.test(\"Expenses update\", function () {\r",
+							"\r",
+							" pm.expect(responseJson.data).to.have.property(\"carId\");\r",
+							" pm.expect(responseJson.data).to.have.property(\"reportedAt\");\r",
+							"});\r",
+							"\r",
+							"pm.environment.set(\"carId\", responseJson.data.carId);\r",
+							"pm.environment.set(\"reportedAt\", responseJson.data.reportedAt);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var currentDate = new Date();\r",
+							"var formattedDate = currentDate.toISOString();\r",
+							"pm.variables.set(\"currentDate\", formattedDate);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"carId\": {{carId}},\r\n  \"reportedAt\": \"{{currentDate}}\",\r\n  \"mileage\": {{mileage}},\r\n  \"liters\": 11,\r\n  \"totalCost\": 11,\r\n  \"forceMileage\": false\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/expenses",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"expenses"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete car",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/cars/{{carId}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"cars",
+						"{{carId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/users",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "https://qauto.forstudy.space/api"
+		}
+	]
+}
